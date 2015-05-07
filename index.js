@@ -2,16 +2,14 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('meshblu-xen-director')
+var request = require('request');
 
 var MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
-    exampleBoolean: {
-      type: 'boolean',
-      required: true
-    },
-    exampleString: {
+    request: {
       type: 'string',
+      enum : ['ApplicationActivitySummaries','Applications','ApplicationInstances','Sessions','Connections','ConnectionFailureCategories','Machines','Catalogs','LoadIndexes','DesktopGroups','Hypervisors','MachineFailureLogs','MachineHotfixLogs','Hotfixes','Users','ConnectionFailureLogs','FailureLogSummaries','LoadIndexSummaries','SessionActivitySummaries','TaskLogs']
       required: true
     }
   }
@@ -20,10 +18,19 @@ var MESSAGE_SCHEMA = {
 var OPTIONS_SCHEMA = {
   type: 'object',
   properties: {
-    firstExampleOption: {
+    username: {
       type: 'string',
       required: true
+    },
+    password: {
+      type: 'string',
+      required: true
+    },
+    baseUrl: {
+      type : 'string',
+      required: true
     }
+
   }
 };
 
@@ -37,7 +44,9 @@ util.inherits(Plugin, EventEmitter);
 
 Plugin.prototype.onMessage = function(message){
   var payload = message.payload;
-  this.emit('message', {devices: ['*'], topic: 'echo', payload: payload});
+  if(message.payload.request){
+    
+  }
 };
 
 Plugin.prototype.onConfig = function(device){
