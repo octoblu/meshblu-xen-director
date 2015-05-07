@@ -9,7 +9,6 @@ var MESSAGE_SCHEMA = {
   properties: {
     request: {
       type: 'string',
-      enum : ['ApplicationActivitySummaries','Applications','ApplicationInstances','Sessions','Connections','ConnectionFailureCategories','Machines','Catalogs','LoadIndexes','DesktopGroups','Hypervisors','MachineFailureLogs','MachineHotfixLogs','Hotfixes','Users','ConnectionFailureLogs','FailureLogSummaries','LoadIndexSummaries','SessionActivitySummaries','TaskLogs']
       required: true
     }
   }
@@ -25,6 +24,10 @@ var OPTIONS_SCHEMA = {
     password: {
       type: 'string',
       required: true
+    },
+    domain: {
+      type : 'string',
+      required : true
     },
     baseUrl: {
       type : 'string',
@@ -45,7 +48,7 @@ util.inherits(Plugin, EventEmitter);
 Plugin.prototype.onMessage = function(message){
   var payload = message.payload;
   if(message.payload.request){
-    
+
   }
 };
 
