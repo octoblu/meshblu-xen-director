@@ -20,9 +20,14 @@ XenDirectorConn.prototype.getViewStateData = function(callback){
     url : self.baseUrl,
     method : "GET",
     rejectUnauthorized : false,
-  }, callback);
+  }, function(error, response, body){
+    if(error) return callback(error);
+    $ = self.cheerio.load(body);
+    var viewState = $('#__VIEWSTATE').attr('value');
+    var eventValidation = $('#__EVENTVALIDATION').attr('value');
 
-
+    callback(null, { viewState: viewState, eventValidation: eventValidation });
+  });
 };
 
 XenDirectorConn.prototype.authenticate = function(callback){

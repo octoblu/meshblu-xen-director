@@ -1,15 +1,18 @@
 var XenDirectorConnection = require('../xen-director-connection');
-
+testHtml = require('./test-html.js');
 
 describe('XenDirectorConnection', function () {
   var dependencies;
-  var FakeRequest, FakeCheerio;
+  var FakeRequest, FakeCheerio, FakeSubCheerio;
 
   beforeEach(function () {
     FakeRequest = sinon.stub();
-
+    FakeSubCheerio = function(){
+      this.attr = sinon.spy()
+      return this;
+    };
     FakeCheerio = {
-      load : sinon.spy()
+      load : sinon.stub().returns(FakeSubCheerio)
     };
     dependencies = { cheerio : FakeCheerio, request: FakeRequest};
   });
@@ -62,7 +65,61 @@ describe('XenDirectorConnection', function () {
         it('should call the callback with an error', function() {
           expect(error).to.exist;
         });
-        
+
+      });
+
+      xdescribe('when the request is successful', function(){
+        var callback = sinon.spy();
+        var error, response, html, cheerio;
+        beforeEach(function(done){
+          html = testHtml('123', '456')
+          FakeRequest.yields(null, {}, html);
+          sut = new XenDirectorConnection({ uri: 'whatever'}, dependencies);
+
+          sut.getViewStateData(function(e, r){
+            if(e) return done(e);
+            response = r;
+            done();
+          });
+
+        });
+
+        it('it should yield the response', function() {
+          expect(response).to.deep.equal({ viewState: '123', eventValidation: '456' });
+        });
+
+        it('should cheerio.load with the body', function(){
+          expect(FakeCheerio.load).to.have.been.calledWith(html);
+        })
+
+        // it('should call the callback with an object that has a viewstate and event')
+      });
+
+      xdescribe('when the request is successful', function(){
+        var callback = sinon.spy();
+        var error, response, html;
+        beforeEach(function(done){
+          html = testHtml('456', '123')
+          FakeRequest.yields(null, {}, html);
+          sut = new XenDirectorConnection({ uri: 'whatever'}, dependencies);
+
+          sut.getViewStateData(function(e, r){
+            if(e) return done(e);
+            response = r;
+            done();
+          });
+
+        });
+
+        it('it should yield the response', function() {
+          expect(response).to.deep.equal({ viewState: '456', eventValidation: '123' });
+        });
+
+        it('should cheerio.load with the body', function(){
+          expect(FakeCheerio.load).to.have.been.calledWith(html);
+        })
+
+        // it('should call the callback with an object that has a viewstate and event')
       });
     });
 });
