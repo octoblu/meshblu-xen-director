@@ -1,5 +1,6 @@
 var _ = require('lodash');
-
+var cookie = require('cookie');
+var debug = require('debug')('meshblu-xen-director:xen-director-connection')
 function XenDirectorConn(options, dependencies){
   options = options || {};
   dependencies = dependencies || {};
@@ -25,8 +26,8 @@ XenDirectorConn.prototype.getViewStateData = function(callback){
     $ = self.cheerio.load(body);
     var viewState = $('#__VIEWSTATE').attr('value');
     var eventValidation = $('#__EVENTVALIDATION').attr('value');
-
-    callback(null, { viewState: viewState, eventValidation: eventValidation });
+    self.viewData = { viewState: viewState, eventValidation: eventValidation }
+    callback(null, self.viewData );
   });
 };
 
@@ -61,32 +62,35 @@ XenDirectorConn.prototype.authenticate = function(viewData, callback){
       if(error){
         return callback(error);
       }
+      self.authenticated = true;
 
-      return callback(null, body);
+      var cookies = cookie.parse(response.request.headers.cookie);
+      debug('The cookies are', cookies);
+      self.cookies = cookies;
+      callback(null, cookies);
+
   });
 };
 
-XenDirectorConn.prototype.getInitializationData = function(siteId, callback){
-  if(!siteId){
-    return callback(new Error('Site Id is required!'));
-  }
 
+
+XenDirectorConn.prototype.getInitializationData = function(callback){
 
   var self = this;
   self.request({
     uri : self.baseUrl + '/service.svc/web/GetInitializationData',
     rejectUnauthorized : false,
-    jar: true,
-    followAllRedirects : true,
-    followRedirect : true,
     method : 'POST',
-    json : true
+    json : true,
+    jar: true
   },
   function(error, response, body){
       if(error){
         return callback(error);
       }
 
+      debug('The headers sent in the request were', response.request.headers);
+      debug('The response from InitializationData is', body);
       return callback(null, body);
   });
 };
