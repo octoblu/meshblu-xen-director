@@ -1,18 +1,26 @@
-var cheerio = require('cheerio');
-var request = require('request');
+var _ = require('lodash');
 
-function XenDirectorConn(options){
+function XenDirectorConn(options, dependencies){
   options = options || {};
+  dependencies = dependencies || {};
   this.baseUrl = options.baseUrl || '';
   this.domain = options.domain || '';
   this.userName = options.userName || '';
   this.password = options.password || '';
-  this.cheerio = options.cheerio || require('cheerio');
-  this.request = options.request || require('request');
+
+  this.cheerio = dependencies.cheerio || require('cheerio');
+  this.request = dependencies.request || require('request');
   return this;
 }
 
 XenDirectorConn.prototype.getViewStateData = function(callback){
+  callback = callback || _.noop();
+  var self = this;
+  self.request({
+    url : self.baseUrl,
+    method : "GET",
+    rejectUnauthorized : false,
+  }, callback);
 
 
 };
