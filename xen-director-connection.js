@@ -82,7 +82,10 @@ XenDirectorConn.prototype.getInitializationData = function(callback){
     rejectUnauthorized : false,
     method : 'POST',
     json : true,
-    jar: true
+    jar: true,
+    headers : {
+      "x-xsrf-token" : self.cookies.XSRF_KEY
+    }
   },
   function(error, response, body){
       if(error){
@@ -107,6 +110,9 @@ XenDirectorConn.prototype.getConnectionFailuresData = function(siteId, callback)
     method : 'POST',
     body : {
       siteId : viewData.viewState
+    },
+    headers : {
+      "x-xsrf-token" : self.cookies.XSRF_KEY
     }
   },
   function(error, response, body){
@@ -131,6 +137,9 @@ XenDirectorConn.prototype.getFailedVDIMachinesData = function(siteId, callback){
     method : 'POST',
     body : {
       siteId : siteId
+    },
+    headers : {
+      "x-xsrf-token" : self.cookies.XSRF_KEY
     }
   },
   function(error, response, body){
