@@ -103,7 +103,7 @@ Plugin.prototype.setOptions = function(options){
   var self = this;
   this.options = options;
   self.xenDirectorConnection = new XenDirectorConnection(options);
-  xenDirectorConnection
+  self.xenDirectorConnection
     .getViewStateData()
     .then(function(viewStateData){
       return xenDirectorConnection.authenticate(viewStateData);
