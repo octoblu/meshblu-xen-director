@@ -13,7 +13,8 @@
     "lodash": "^3.8.0",
     "meshblu": "^1.9.0",
     "request": "^2.55.0",
-    "tough-cookie": "^1.1.0"
+    "tough-cookie": "^1.1.0",
+    "when": "^3.7.3"
   },
   "keywords": [
     "meshblu-connector",
