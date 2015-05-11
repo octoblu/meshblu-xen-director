@@ -2,7 +2,7 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('meshblu-xen-director')
-var XenDirectorConnection = require('xen-director-connection');
+var XenDirectorConnection = require('./xen-director-connection');
 
 var MESSAGE_SCHEMA = {
   type: 'object',
@@ -81,7 +81,7 @@ Plugin.prototype.onMessage = function(message){
           self.emit('data', error);
         });
      }
-     
+
      if(request === 'GetFailedVDIMachinesData'){
        self.xenDirectorConnection
         .getFailedVDIMachinesData(message.payload.siteId)
