@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var cookie = require('cookie');
-var debug = require('debug')('meshblu-xen-director:xen-director-connection');
+var debug = require('debug')('xen-director-connection');
 var when = require('when');
 function XenDirectorConn(options, dependencies){
   options = options || {};
@@ -17,6 +17,8 @@ function XenDirectorConn(options, dependencies){
 
 XenDirectorConn.prototype.getViewStateData = function(){
   var self = this;
+
+
   return when.promise(function(resolve, reject){
     self.request({
       url : self.baseUrl,
@@ -31,28 +33,30 @@ XenDirectorConn.prototype.getViewStateData = function(){
       $ = self.cheerio.load(body);
       var viewState = $('#__VIEWSTATE').attr('value');
       var eventValidation = $('#__EVENTVALIDATION').attr('value');
-      self.viewData = { viewState: viewState, eventValidation: eventValidation }
-      resolve(viewData);
+      self.viewData = { viewState: viewState, eventValidation: eventValidation };
+      console.log('ViewData', self.viewData);
+      resolve(self.viewData);
     });
   });
 };
 
 XenDirectorConn.prototype.authenticate = function(viewData){
   var self = this;
-
+  self.cookieJar = self.request.jar();
   return when.promise(function(resolve, reject){
     if(!viewData){
-      return reject(new Error('View Data is required!'));
+      reject(new Error('View Data is required!'));
     }
 
     if(!viewData.viewState || !viewData.eventValidation){
-      return reject(new Error("viewState and eventValidation are required!"));
+      reject(new Error("viewState and eventValidation are required!"));
     }
 
+    debug('Making request', self);
     self.request({
       uri : self.baseUrl + '/Logon.aspx',
       rejectUnauthorized : false,
-      jar: true,
+      jar: self.cookieJar,
       followAllRedirects : true,
       followRedirect : true,
       method : 'POST',
@@ -71,11 +75,11 @@ XenDirectorConn.prototype.authenticate = function(viewData){
           reject(error);
         }
         self.authenticated = true;
-
-        var cookies = cookie.parse(response.request.headers.cookie);
-        debug('The cookies are', cookies);
-        self.cookies = cookies;
-        resolve(cookies);
+        self.cookieJar.getCookies(self.baseUrl, function(err, cookies){
+          self.cookies = cookies;
+          debug('cookies', cookies);
+          resolve(cookies);
+        });
     });
   });
 };
@@ -98,7 +102,7 @@ XenDirectorConn.prototype.getInitializationData = function(){
     },
     function(error, response, body){
         if(error){
-          return reject(error);
+          reject(error);
         }
 
         debug('The headers sent in the request were', response.request.headers);
@@ -122,9 +126,10 @@ XenDirectorConn.prototype.getConnectionFailuresData = function(siteId){
       uri : self.baseUrl + '/service.svc/web/GetConnectionFailuresData',
       rejectUnauthorized : false,
       json: true,
+      jar : true,
       method : 'POST',
       body : {
-        siteId : viewData.viewState
+        siteId : siteId
       },
       headers : {
         "x-xsrf-token" : self.cookies.XSRF_KEY
@@ -164,7 +169,7 @@ XenDirectorConn.prototype.getFailedVDIMachinesData = function(siteId, callback){
     },
     function(error, response, body){
         if(error){
-          return reject(error);
+          reject(error);
         }
         resolve(body);
     });

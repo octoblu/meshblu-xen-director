@@ -60,37 +60,14 @@ Plugin.prototype.onMessage = function(message){
   var self = this;
   var payload = message.payload;
   if(message.payload.request){
-     if(request === 'GetInitializationData'){
-       self.xenDirectorConnection
-       .getInitializationData()
-       .then(function(initData){
-         self.emit('data', initData)
+
+     if(!self.xenDirectorConnection.authenticated){
+       self.authConnection()
+       .then(function(authResults){
+         self.handleRequest(message);
        })
-       .catch(function(error){
-           self.emit('data', error);
-       });
-     }
-
-     if(request === 'GetConnectionFailuresData'){
-       self.xenDirectorConnection
-        .getConnectionFailuresData(message.payload.siteId)
-        .then(function(connectionData){
-          self.emit('data', connectionData);
-        })
-        .catch(function(error){
-          self.emit('data', error);
-        });
-     }
-
-     if(request === 'GetFailedVDIMachinesData'){
-       self.xenDirectorConnection
-        .getFailedVDIMachinesData(message.payload.siteId)
-        .then(function(connectionData){
-          self.emit('data', connectionData);
-        })
-        .catch(function(error){
-          self.emit('data', error);
-        });
+     } else {
+       self.handleRequest(message);
      }
   }
 };
@@ -103,16 +80,57 @@ Plugin.prototype.setOptions = function(options){
   var self = this;
   this.options = options;
   self.xenDirectorConnection = new XenDirectorConnection(options);
-  self.xenDirectorConnection
+
+};
+
+Plugin.prototype.authConnection = function(){
+  var self = this;
+  return self.xenDirectorConnection
     .getViewStateData()
     .then(function(viewStateData){
-      return xenDirectorConnection.authenticate(viewStateData);
+      console.log('View State', viewStateData);
+      return self.xenDirectorConnection.authenticate(viewStateData);
     })
     .then(function(authResults){
       debug('Authenticated', authResults);
+      return authResults;
     });
 };
 
+Plugin.prototype.handleRequest = function(message){
+  if(message.payload.request === 'GetInitializationData'){
+    self.xenDirectorConnection
+    .getInitializationData()
+    .then(function(initData){
+      self.emit('data', initData)
+    })
+    .catch(function(error){
+        self.emit('data', error);
+    });
+  }
+
+  if(message.payload.request === 'GetConnectionFailuresData'){
+    self.xenDirectorConnection
+     .getConnectionFailuresData(message.payload.siteId)
+     .then(function(connectionData){
+       self.emit('data', connectionData);
+     })
+     .catch(function(error){
+       self.emit('data', error);
+     });
+  }
+
+  if(message.payload.request === 'GetFailedVDIMachinesData'){
+    self.xenDirectorConnection
+     .getFailedVDIMachinesData(message.payload.siteId)
+     .then(function(connectionData){
+       self.emit('data', connectionData);
+     })
+     .catch(function(error){
+       self.emit('data', error);
+     });
+  }
+};
 
 module.exports = {
   messageSchema: MESSAGE_SCHEMA,

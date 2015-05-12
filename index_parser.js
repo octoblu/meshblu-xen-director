@@ -7,26 +7,17 @@ var xenDirectorConnection = new XenDirectorConnection({
     password : 'Citrix123!'
 });
 
-xenDirectorConnection.getViewStateData(function(error, viewStateData){
-  if(error){
-    console.log('Error', error);
-  }
-
-  xenDirectorConnection.authenticate(viewStateData, function(authError, authResults){
-    if(authError){
-      console.log('Authentication Error', authError);
-    }
-
-    console.log('Authenticated');
-    console.log(authResults);
-
-    xenDirectorConnection.getInitializationData(function(initError, initializationData){
-      if(initError){
-        console.log('Initialization Error', initError);
-      }
-
-      console.log('Initialization Data');
-      console.log(initializationData);
-    });
-  });
+xenDirectorConnection.getViewStateData()
+.then(function(viewStateData){
+  return xenDirectorConnection.authenticate(viewStateData);
+})
+.then(function(authResults){
+  console.log('Auth Results', authResults);
+  return xenDirectorConnection.getInitializationData();
+})
+.then(function(initData){
+  console.log('Initialization Data', initData);
+})
+.catch(function(error){
+  console.log('Ooops me no workey', error);
 });
