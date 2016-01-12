@@ -1,5 +1,2 @@
-'use strict';
-var config = require('./meshblu.json');
-var Connector = require('./connector');
-
-new Connector(config);
+require('coffee-script/register');
+require('./command.coffee');
