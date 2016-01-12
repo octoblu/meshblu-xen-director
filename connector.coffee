@@ -40,6 +40,7 @@ class Connector extends EventEmitter
 
   onReady: =>
     @conx.whoami uuid: @config.uuid, (device) =>
+      #Check if the device has a public private key on options
       @plugin.setOptions device.options
       oldRecentVersions = device.recentVersions || [];
       recentVersions = _.union oldRecentVersions, [packageJSON.version]
