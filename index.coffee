@@ -31,10 +31,10 @@ MESSAGE_SCHEMA =
 OPTIONS_SCHEMA =
   type: 'object'
   properties:
-    domain:
+    customerId:
       type: 'string'
       required: true
-    hostUrl:
+    domain:
       type: 'string'
       required: true
     username:
@@ -51,33 +51,37 @@ class Plugin extends EventEmitter
     @optionsSchema = OPTIONS_SCHEMA
     @queryKeys = [LATEST_SERVER_OS_FAILURE, LATEST_DESKTOP_OS_FAILURE, LATEST_CONNECTION_FAILURE, LOGON_COUNT, NUMBER_OF_RUNNING_ACTIVE_SESSIONS ]
     @queryMap =
-      LATEST_SERVER_OS_FAILURE : LATEST_SERVER_OS_FAILURE_QUERY
-      LATEST_DESKTOP_OS_FAILURE: LATEST_DESKTOP_OS_FAILURE_QUERY
-      LATEST_CONNECTION_FAILURE: LATEST_CONNECTION_FAILURE_QUERY
-      LOGON_COUNT : LOGON_COUNT_QUERY
-      NUMBER_OF_RUNNING_ACTIVE_SESSIONS: NUMBER_OF_RUNNING_ACTIVE_SESSIONS_QUERY
+      "#{LATEST_SERVER_OS_FAILURE}" : LATEST_SERVER_OS_FAILURE_QUERY
+      "#{LATEST_DESKTOP_OS_FAILURE}": LATEST_DESKTOP_OS_FAILURE_QUERY
+      "#{LATEST_CONNECTION_FAILURE}": LATEST_CONNECTION_FAILURE_QUERY
+      "#{LOGON_COUNT}" : LOGON_COUNT_QUERY
+      "#{NUMBER_OF_RUNNING_ACTIVE_SESSIONS}": NUMBER_OF_RUNNING_ACTIVE_SESSIONS_QUERY
 
 
   onMessage: (message) =>
-
+    debug "Message", message
     payload = message.payload
-    query = message.query? or payload.query?
+    query = message.query or payload.query
+    return @emit "error", "Missing customerId from config" unless @options.customerId?
     return @emit "error", "Missing domain from config" unless @options.domain?
     return @emit "error", "Missing username from config" unless @options.username?
-    return @emit "error", "Missing hostUrl from config" unless @options.hostUrl?
     return @emit "error", "Missing password from config" unless @options.password?
-    return @emit "error", "Missing query from message" unless query
+    return @emit "error", "Missing query from message" unless query?
     return @emit "error", "Invalid query option: #{query}" unless _.contains @queryKeys, query
 
-    queryUrl = "https://#{@options.domain}.#{@options.hostUrl}/#{@queryMap[query]}"
+    queryUrl = "https://#{@options.customerId}.#{@options.domain}/#{@queryMap[query]}"
+    debug "Query URL", queryUrl
 
-    authHeader = new Buffer("#{@options.username}:#{@options.password}").toString("base64")
+    authHeader = new Buffer("#{@options.domain}/#{@options.username}:#{@options.password}").toString("base64")
+
     reqOptions =
       method: "GET"
       uri : queryUrl
       json: true
       headers:
         Authorization: "Basic #{authHeader}"
+
+    debug "Request Options", reqOptions
 
     request reqOptions, (error, response, body) =>
       if error?
@@ -86,7 +90,7 @@ class Plugin extends EventEmitter
 
       debug "Response", response.statusCode
       debug "Body", body
-      result = 
+      result =
         status : response.statusCode
         data: body
 
