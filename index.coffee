@@ -97,9 +97,11 @@ class Plugin extends EventEmitter
       return @emit "message", result
 
   onConfig: (device) =>
+    debug "Options", device.options
     @setOptions device.options
 
   setOptions: (options={}) =>
+    debug "Set Options", options
     @options = options
 
 module.exports =
