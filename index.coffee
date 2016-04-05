@@ -6,19 +6,19 @@ _              = require 'lodash'
 request        = require 'request'
 #Constants for Query Commands and Query Paths
 LATEST_SERVER_OS_FAILURE = "Latest Server OS Failure"
-LATEST_SERVER_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=2&$format=JSON"
+LATEST_SERVER_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=2&$format=json"
 
 LATEST_DESKTOP_OS_FAILURE = "Latest Desktop OS Failure"
-LATEST_DESKTOP_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=1&$format=JSON"
+LATEST_DESKTOP_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=1&$format=json"
 
 LOGON_COUNT = "Logon Count"
-LOGON_COUNT_QUERY = "Citrix/Monitor/OData/v3/methods/GetLogOnCountTrendLatest()?intervalLength=1&numberOfIntervals=60&$format=JSON"
+LOGON_COUNT_QUERY = "Citrix/Monitor/OData/v3/methods/GetLogOnCountTrendLatest()?intervalLength=1&numberOfIntervals=60&$format=json"
 
 LATEST_CONNECTION_FAILURE = "Latest connection failures"
-LATEST_CONNECTION_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetConnectionFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=60&connectionFailureType=0&$format=JSON"
+LATEST_CONNECTION_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetConnectionFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=60&connectionFailureType=0&$format=json"
 
 NUMBER_OF_RUNNING_ACTIVE_SESSIONS = "Number of running active sessions"
-NUMBER_OF_RUNNING_ACTIVE_SESSIONS_QUERY = "Citrix/Monitor/OData/v3/methods/GetConcurrentSessionsTrendLatest()?intervalLength=1&numberOfIntervals=60&$format=JSON"
+NUMBER_OF_RUNNING_ACTIVE_SESSIONS_QUERY = "Citrix/Monitor/OData/v3/methods/GetConcurrentSessionsTrendLatest()?intervalLength=1&numberOfIntervals=60&$format=json"
 
 MESSAGE_SCHEMA =
   type: 'object'
