@@ -78,7 +78,7 @@ class Plugin extends EventEmitter
     reqOptions =
       username: @options.username
       password: @options.password
-      domain: "https://#{@options.customerId}.#{@options.domain}"
+      domain: "#{@options.customerId}.#{@options.domain}"
       url: queryUrl
 
     debug "Request Options", reqOptions
