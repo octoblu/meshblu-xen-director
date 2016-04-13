@@ -4,7 +4,7 @@ util           = require 'util'
 debug          = require('debug')('meshblu-xen-director')
 _              = require 'lodash'
 request        = require 'request'
-ntlm           = require 'request-ntlm'
+httpntlm       = require 'httpntlm'
 #Constants for Query Commands and Query Paths
 LATEST_SERVER_OS_FAILURE = "Latest Server OS Failure"
 LATEST_SERVER_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=2&$format=json"
@@ -83,14 +83,15 @@ class Plugin extends EventEmitter
 
     debug "Request Options", reqOptions
 
-    ntlm.post reqOptions, (err, response) =>
+    httpntlm.post reqOptions, (err, response) =>
       if err?
         debug "Error: ", err
         return @emit "error", err
 
-      debug "Response: ", response.statusCode
+      debug "Response: ", response
       result =
         status: response.statusCode
+        response: response
 
       return @emit "message: ", result
     # request reqOptions, (error, response, body) =>

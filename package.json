@@ -11,10 +11,10 @@
   "dependencies": {
     "coffee-script": "^1.10.0",
     "debug": "^2.2.0",
+    "httpntlm": "^1.5.3",
     "lodash": "^3.10.1",
     "meshblu": "^1.32.0",
-    "meshblu-config": "^3.1.1",
-    "request-ntlm": "0.0.6"
+    "meshblu-config": "^3.1.1"
   },
   "bundledDependencies": [
     "request",
