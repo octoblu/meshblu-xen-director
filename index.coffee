@@ -3,8 +3,7 @@ util           = require 'util'
 {EventEmitter} = require 'events'
 debug          = require('debug')('meshblu-xen-director')
 _              = require 'lodash'
-request        = require 'request'
-httpntlm       = require 'httpntlm'
+ntlm           = require 'request-ntlm-continued'
 #Constants for Query Commands and Query Paths
 LATEST_SERVER_OS_FAILURE = "Latest Server OS Failure"
 LATEST_SERVER_OS_FAILURE_QUERY = "Citrix/Monitor/OData/v3/methods/GetMachineFailureTrendsByTypeLatest()?intervalLength=1&numberOfIntervals=0&machineFailureType=0&sessionSupport=2&$format=json"
@@ -78,34 +77,24 @@ class Plugin extends EventEmitter
     reqOptions =
       username: @options.username
       password: @options.password
-      domain: "#{@options.customerId}.#{@options.domain}"
+      ntlm_domain: "#{@options.customerId}.#{@options.domain}"
       url: queryUrl
 
     debug "Request Options", reqOptions
-
-    httpntlm.post reqOptions, (err, response) =>
+    console.log "request options: ", reqOptions
+    ntlm.post reqOptions, {}, (err, response) =>
       if err?
         debug "Error: ", err
         return @emit "error", err
 
       debug "Response: ", response
+
       result =
         status: response.statusCode
         response: response
 
+      console.log "message: ", result
       return @emit "message: ", result
-    # request reqOptions, (error, response, body) =>
-    #   if error?
-    #     debug "Error", error
-    #     return @emit "error", error
-    #
-    #   debug "Response", response.statusCode
-    #   debug "Body", body
-    #   result =
-    #     status : response.statusCode
-    #     data: body
-    #
-    #   return @emit "message", result
 
   onConfig: (device) =>
     debug "Options", device.options
